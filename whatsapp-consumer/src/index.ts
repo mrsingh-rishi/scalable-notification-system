@@ -16,6 +16,7 @@ async function main() {
 
       try {
         await WhatsAppEngine.getInstance().sendWhatsAppMessage({ body, to });
+        console.log("WhatsApp message sent successfully");
       } catch (error) {
         console.log(error);
       }

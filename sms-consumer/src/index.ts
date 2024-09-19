@@ -16,6 +16,7 @@ async function main() {
       // process the message send notification
       try {
         await SMSEngine.getInstance().sendSMS({ body, to });
+        console.log("SMS Message Sent Successfully");
       } catch (error) {
         console.log(error);
       }
