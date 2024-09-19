@@ -5,7 +5,6 @@ type QueueNames = "email" | "sms" | "whatsapp";
 type PriorityQueues = Record<QueueNames, string[]>;
 
 const client = createClient();
-const publisher = createClient();
 
 // List of priority queues for each channel
 const priorityQueues: PriorityQueues = {
@@ -21,13 +20,12 @@ const MAX_MESSAGES_PER_SECOND = 10; // Limit to 10 messages per second
  * It continually checks priority queues and pushes messages to the main queues.
  *
  * This function:
- * - Connects to the Redis client and publisher.
+ * - Connects to the Redis client.
  * - Continuously loops through the priority queues for each base channel.
  * - Checks and processes messages based on priority.
  * - Enforces a rate limit on the number of messages pushed to the main queue per second.
  */
 async function main() {
-  await publisher.connect();
   await client.connect();
 
   let messageCount = 0; // Counter to track number of messages pushed in the current second
