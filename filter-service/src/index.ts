@@ -34,14 +34,22 @@ async function main() {
   while (true) {
     // Iterate over each base channel (email, sms, whatsapp) using for...in
     for (const baseChannel in priorityQueues) {
+      // console.log("base channel: " + baseChannel);
       if (priorityQueues.hasOwnProperty(baseChannel)) {
         const queues = priorityQueues[baseChannel as QueueNames];
         const [priorityQueue, message] = await checkPriorityQueue(queues);
-
         if (priorityQueue) {
+          console.log(
+            "priorityQueue: " + priorityQueue + " and message is " + message
+          );
           const currentTime = Date.now();
           const elapsedTime = (currentTime - lastPushTime) / 1000; // Convert to seconds
-
+          console.log(
+            "Received message from queue " +
+              priorityQueue +
+              " messages: " +
+              message
+          );
           // Reset message count if more than 1 second has passed
           if (elapsedTime >= 1) {
             messageCount = 0;
@@ -54,11 +62,22 @@ async function main() {
               `Pushing message from ${priorityQueue} to ${baseChannel} queue: ${message}`
             );
             await client.lPush(baseChannel, message); // Push to the left of the main queue
+            console.log(
+              "Pushed message from queue " +
+                priorityQueue +
+                " to " +
+                baseChannel +
+                " and the message is " +
+                message
+            );
             messageCount++; // Increment message count for this second
           } else {
+            console.log(
+              "Rate limit exceeded so blocking is the requested channel"
+            );
             // If limit is reached, wait for the next second
             await new Promise((resolve) =>
-              setTimeout(resolve, 1000 - elapsedTime * 1000)
+              setTimeout(resolve, 5000 + (1000 - elapsedTime * 1000))
             );
           }
         }
@@ -88,6 +107,9 @@ async function checkPriorityQueue(
     // Try to pop a message from the highest-priority queue (right side)
     const message = await client.rPop(queue);
     if (message) {
+      console.log(
+        "Poped message from queue: " + message + " from queue: " + queue
+      );
       return [queue, message]; // Return the queue and the message
     }
   }

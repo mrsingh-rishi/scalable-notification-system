@@ -52,9 +52,16 @@ export class RedisManager {
     const fullChannel = `${channel}${priority}`;
 
     // Publish the message to the constructed channel
-    await this.publisher.publish(
+    await this.publisher.lPush(
       fullChannel,
       JSON.stringify({ to, message }) // Serialize the message with recipient
+    );
+
+    console.log(
+      "Pushed message to queue " +
+        fullChannel +
+        " and the messaage is " +
+        message
     );
   }
 }
